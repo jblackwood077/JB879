@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JBlackwood | Advanced Venture Architecture</title>
+    <style>
+        /* =========================================
+           VARIABLES PREMIUM & DESIGN SYSTEM
+           ========================================= */
+        :root {
+            --bg-main: #060913;
+            --bg-surface: #0b1120;
+            --bg-surface-elevated: #111a2e;
+            --border-color: rgba(255, 255, 255, 0.06);
+            
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            --secondary: #10b981;
+            
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-inverse: #060913;
+            
+            --font-stack: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* =========================================
+           RESET STANDARD HIGH-END
+           ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-stack);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow-x: hidden; /* Empêche le scroll horizontal buggé */
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* INDICATEUR DE DEFILEMENT */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            z-index: 2000;
+            transition: width 0.1s ease;
+        }
+
+        /* =========================================
+           NAVIGATION
+           ========================================= */
+        #main-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: var(--border-color) 1px solid;
+            background: rgba(6, 9, 19, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            padding: 1.5rem 5%;
+        }
+
+        #main-header.scrolled {
+            padding: 1rem 5%;
+            background: rgba(6, 9, 19, 0.95);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-logo span {
+            color: var(--primary);
+        }
+
+        .nav-menu ul {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu { display: none; /* Menu caché sur mobile pour faire simple */ }
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-main);
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        /* BOUTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 1.6rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--text-main);
+            color: var(--text-inverse);
+        }
+
+        .btn-primary:hover {
+            background-color: transparent;
+            color: var(--text-main);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            box-shadow: inset 0 0 0 1px var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .btn-link {
+            color: var(--text-muted);
+            padding: 0;
+        }
+        .btn-link:hover {
+            color: var(--primary);
+        }
+
+        /* =========================================
+           SECTION HERO
+           ========================================= */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5%;
+            position: relative;
+            text-align: center;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 50vw;
+            height: 50vw;
+            max-width: 600px;
+            max-height: 600px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+            padding-top: 80px; /* Compense le header fixe */
+        }
+
+        .badge-reveal {
+            display: inline-flex;
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            padding: 6px 16px;
+            border-radius: 100px;
+            margin-bottom: 2rem;
+        }
+
+        .badge-text {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #818cf8;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #fff 30%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 2.5rem auto;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap; /* Pour les petits écrans */
+        }
+
+        /* =========================================
+           BANDEAU DEFILANT (Correction Bug Overflow)
+           ========================================= */
+        .marquee-wrapper {
+            width: 100vw;
+            overflow: hidden; /* Essentiel pour éviter le scroll horizontal */
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.01);
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+
+        .marquee-container {
+            display: flex;
+            width: fit-content;
+            padding: 1.5rem 0;
+            animation: scroll-marquee 30s linear infinite;
+        }
+
+        .marquee-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            padding-right: 2rem;
+        }
+
+        .marquee-content span {
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+        }
+
+        @keyframes scroll-marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } /* Ajusté pour une boucle parfaite avec le contenu dupliqué */
+        }
+
+        /* =========================================
+           SECTIONS COMMUNES
+           ========================================= */
+        section {
+            padding: 100px 5%;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tagline {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            letter-spacing: 1.5px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 1rem auto 0 auto;
+        }
+
+        /* =========================================
+           METRICS AVANCÉS
+           ========================================= */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-surface);
+            padding: 3rem;
+        }
+
+        .metric-card {
+            text-align: center;
+            position: relative;
+        }
+
+        .metric-card:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -1rem;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background: var(--border-color);
+        }
+
+        @media (max-width: 850px) {
+            .metric-card:not(:last-child)::after { display: none; }
+        }
+
+        .metric-value {
+            display: inline-block;
+            font-size: clamp(3rem, 5vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: var(--text-main);
+        }
+
+        .metric-unit {
+            display: inline-block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-left: 2px;
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            max-width: 220px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* =========================================
+           PORTFOLIO & ACTIFS LOGICIELS
+           ========================================= */
+        .portfolio-large-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 968px) {
+            .portfolio-large-card { grid-template-columns: 1fr; }
+            .card-visual { min-height: 250px; border-left: none; border-top: 1px solid var(--border-color); }
+        }
+
+        .card-content {
+            padding: clamp(2rem, 4vw, 4rem);
+        }
+
+        .project-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+
+        .market-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            align-self: center;
+        }
+
+        .project-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .project-description {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .project-highlights {
+            list-style: none;
+        }
+
+        .project-highlights li {
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            position: relative;
+            padding-left: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .project-highlights li strong {
+            color: var(--text-main);
+        }
+
+        .project-highlights li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+
+        .card-visual {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .visual-mockup {
+            width: 60%;
+            height: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.4);
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .mockup-line {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            width: 80%;
+            margin-bottom: 10px;
+            border-radius: 2px;
+        }
+        .mockup-line.short { width: 50%; }
+
+        .mockup-circle {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .portfolio-small-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            transition: var(--transition-smooth);
+        }
+
+        .portfolio-small-card:hover {
+            border-color: rgba(255,255,255,0.15);
+            transform: translateY(-4px);
+        }
+
+        .portfolio-small-card h4 {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+
+        .portfolio-small-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* =========================================
+           GRILLE ARCHITECTURE TECHNIQUE
+           ========================================= */
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .arch-card {
+            background: linear-gradient(180deg, var(--bg-surface) 0%, rgba(11,17,32,0.5) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+        }
+
+        .arch-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .arch-card h5 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .arch-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* =========================================
+           SECTION CONTACT
+           ========================================= */
+        .contact-box {
+            background: radial-gradient(circle at top right, var(--primary-glow), transparent);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: clamp(2rem, 5vw, 4rem);
+            text-align: center;
+        }
+
+        .contact-box h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-box p {
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto 3rem auto;
+        }
+
+        .contact-form {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap; /* Assure que les inputs passent l'un sous l'autre sur mobile */
+        }
+
+        .form-row input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: var(--transition-smooth);
+        }
+
+        .contact-form input:focus, .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.2);
+        }
+
+        .contact-form textarea {
+            height: 150px;
+            resize: none;
+            margin-bottom: 2rem;
+        }
+
+        /* =========================================
+           FOOTER
+           ========================================= */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        .footer-bottom p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* =========================================
+           REVEAL ANIMATION ENGINE
+           ========================================= */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="scroll-progress"></div>
+
+    <header id="main-header">
+        <div class="header-container">
+            <a href="#" class="brand-logo">
+                J<span>Blackwood</span>
+            </a>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="#hero" class="nav-link active">Vision</a></li>
+                    <li><a href="#metrics" class="nav-link">Indicateurs</a></li>
+                    <li><a href="#ecosystem" class="nav-link">Écosystème</a></li>
+                    <li><a href="#architecture" class="nav-link">Expertise</a></li>
+                </ul>
+            </nav>
+            <div class="header-cta">
+                <a href="#contact" class="btn btn-secondary">Nous Contacter</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+            <div class="badge-reveal">
+                <span class="badge-text">Venture Studio & Infrastructure</span>
+            </div>
+            <h1 class="hero-title">
+                Architectes des <br>
+                <span>Infrastructures de Demain</span>
+            </h1>
+            <p class="hero-subtitle">
+                JBlackwood incube, finance et déploie des plateformes technologiques hautement scalables. Nous transformons les frictions urbaines et numériques en opportunités de croissance automatisées.
+            </p>
+            <div class="hero-actions">
+                <a href="#ecosystem" class="btn btn-primary">Explorer l'Écosystème</a>
+                <a href="#architecture" class="btn btn-link">Notre Framework technique →</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="marquee-wrapper">
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <span>SMART CITY</span>
+                <span>•</span>
+                <span>PEER-TO-PEER ECONOMY</span>
+                <span>•</span>
+                <span>AUTOMATED INFRASTRUCTURE</span>
+                <span>•</span>
+                <span>ALGORITHMIC MATCHING</span>
+                <span>•</span>
+                <span>FINTECH INTEGRATION</span>
+                <span>•</span>
+            </div>
+            <div class="marquee-content" aria-hidden="true">
+                <span>SMART CITY</span>
+                <span>•</span>
+                <span>PEER-TO-PEER ECONOMY</span>
+                <span>•</span>
+                <span>AUTOMATED INFRASTRUCTURE</span>
+                <span>•</span>
+                <span>ALGORITHMIC MATCHING</span>
+                <span>•</span>
+                <span>FINTECH INTEGRATION</span>
+                <span>•</span>
+            </div>
+        </div>
+    </div>
+
+    <section id="metrics">
+        <div class="metrics-grid">
+            <div class="metric-card reveal-up">
+                <div class="metric-value" data-target="1.5">0</div>
+                <div class="metric-unit">M€</div>
+                <p class="metric-label">Objectif de CA annuel à Horizon 3 ans sur nos segments clés</p>
+            </div>
+            <div class="metric-card reveal-up" style="transition-delay: 0.1s;">
+                <div class="metric-value" data-target="100">0</div>
+                <div class="metric-unit">%</div>
+                <p class="metric-label">Automatisation des processus opérationnels et de modération</p>
+            </div>
+            <div class="metric-card reveal-up" style="transition-delay: 0.2s;">
+                <div class="metric-value" data-target="30">0</div>
+                <div class="metric-unit">M</div>
+                <p class="metric-label">Places de stationnement ciblées par notre infrastructure urbaine</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="ecosystem">
+        <div class="section-header reveal-up">
+            <span class="section-tagline">Portfolio Actif</span>
+            <h2 class="section-title">Nos Actifs Technologiques</h2>
+            <p class="section-desc">Découvrez les projets propriétaires et incubés développés sous l'égide de JBlackwood.</p>
+        </div>
+
+        <div class="portfolio-container">
+            <div class="portfolio-large-card reveal-up">
+                <div class="card-content">
+                    <div class="project-meta">
+                        <span class="status-badge">Phase 1 - Lancement Lyon</span>
+                        <span class="market-tag">Smart City / P2P</span>
+                    </div>
+                    <h3 class="project-title">Projet SpotAir</h3>
+                    <p class="project-description">
+                        L'Airbnb du stationnement. Une infrastructure logicielle complète permettant la monétisation peer-to-peer des espaces de stationnement privés inutilisés. Intégration d'algorithmes de tarification dynamique et de tunnels de conversion sans friction.
+                    </p>
+                    <ul class="project-highlights">
+                        <li><strong>Fintech :</strong> Split automatisé des paiements via Stripe Connect (15% commission / 85% propriétaire).</li>
+                        <li><strong>Sécurité :</strong> Vérification d'identité (KYC léger) automatisée par API tierce.</li>
+                        <li><strong>Scalabilité :</strong> Modèle "Zero-Inventory" sans aucun actif immobilier physique.</li>
+                    </ul>
+                </div>
+                <div class="card-visual">
+                    <div class="visual-mockup">
+                        <div class="mockup-line"></div>
+                        <div class="mockup-line short"></div>
+                        <div class="mockup-circle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-grid">
+                <div class="portfolio-small-card reveal-up">
+                    <span class="market-tag">Data Architecture</span>
+                    <h4>JB Analytics Engine</h4>
+                    <p>Core technologique de traitement des données de géolocalisation en temps réel, optimisant le matching offre/demande à l'échelle métropolitaine.</p>
+                </div>
+                <div class="portfolio-small-card reveal-up" style="transition-delay: 0.1s;">
+                    <span class="market-tag">Identity & Trust</span>
+                    <h4>SecureID Framework</h4>
+                    <p>Protocoles de confiance et briques de sécurité propriétaires appliqués à la modération automatisée et aux systèmes anti-fraude textuels.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="architecture">
+        <div class="section-header reveal-up">
+            <span class="section-tagline">Expertise Technique</span>
+            <h2 class="section-title">Notre Stack Standardisée</h2>
+            <p class="section-desc">Toutes nos filiales et applications partagent un écosystème technique moderne et hautement sécurisé.</p>
+        </div>
+
+        <div class="architecture-grid">
+            <div class="arch-card reveal-up">
+                <div class="arch-icon">⚡</div>
+                <h5>Performance Front-End</h5>
+                <p>Déploiements systématiques basés sur l'architecture Next.js (React) combinée à des CMS headless pour un SEO local surpuissant.</p>
+            </div>
+            <div class="arch-card reveal-up" style="transition-delay: 0.1s;">
+                <div class="arch-icon">🔒</div>
+                <h5>Sécurité & RGPD</h5>
+                <p>Chiffrement des données sensibles au repos (AES-256), tokenisation bancaire absolue et conformité native aux réglementations européennes.</p>
+            </div>
+            <div class="arch-card reveal-up" style="transition-delay: 0.2s;">
+                <div class="arch-icon">⚙️</div>
+                <h5>Automation Back-Office</h5>
+                <p>Centralisation des opérations via des Control Centers unifiés dotés d'agents IA génératifs pour l'automatisation de contenu et la gestion de bases de données.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="contact-box reveal-up">
+            <h2>Initier un Partenariat Stratégique</h2>
+            <p>Vous souhaitez en savoir plus sur l'infrastructure JBlackwood ou suivre nos levées de fonds amorçage ? Contactez notre pôle corporate.</p>
+            <form class="contact-form" onsubmit="event.preventDefault();">
+                <div class="form-row">
+                    <input type="text" placeholder="Nom Complet" required>
+                    <input type="email" placeholder="Adresse Email Professionnelle" required>
+                </div>
+                <textarea placeholder="Votre Message (Demande d'information, relations investisseurs...)" required></textarea>
+                <button type="submit" class="btn btn-primary">Soumettre la Demande</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-bottom">
+            <p>&copy; 2026 JBlackwood Inc. Tous droits réservés. Document confidentiel à usage de revue académique et partenariale.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // 1. ENGINE DE NAVIGATION FLUIDE & SCROLL BAR
+            const header = document.getElementById('main-header');
+            const scrollProgress = document.getElementById('scroll-progress');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                
+                // Progression
+                const scrolledPercentage = (scrollTop / docHeight) * 100;
+                scrollProgress.style.width = scrolledPercentage + '%';
+
+                // Header au scroll
+                if (scrollTop > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+
+                // Section active
+                let currentSectionId = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 160;
+                    if (scrollTop >= sectionTop) {
+                        currentSectionId = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(currentSectionId)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // 2. ANIMATION COMPTEUR
+            const startCounterAnimation = (metricElement) => {
+                const targetValue = parseFloat(metricElement.getAttribute('data-target'));
+                const duration = 2000; 
+                const frameRate = 1000 / 60;
+                const totalFrames = Math.round(duration / frameRate);
+                let currentFrame = 0;
+
+                const animate = () => {
+                    currentFrame++;
+                    const progress = currentFrame / totalFrames;
+                    const easeProgress = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                    const currentValue = targetValue * easeProgress;
+
+                    if (targetValue % 1 !== 0) {
+                        metricElement.textContent = currentValue.toFixed(1);
+                    } else {
+                        metricElement.textContent = Math.floor(currentValue);
+                    }
+
+                    if (currentFrame < totalFrames) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        metricElement.textContent = targetValue;
+                    }
+                };
+                requestAnimationFrame(animate);
+            };
+
+            // 3. REVEAL AU SCROLL (INTERSECTION OBSERVER)
+            const revealElements = document.querySelectorAll('.reveal-up');
+            
+            const globalObserverOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -40px 0px"
+            };
+
+            const globalObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+
+                        // Lancement du compteur si visible
+                        const metricValue = entry.target.querySelector('.metric-value');
+                        if (metricValue && !metricValue.classList.contains('counted')) {
+                            metricValue.classList.add('counted');
+                            startCounterAnimation(metricValue);
+                        }
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, globalObserverOptions);
+
+            revealElements.forEach(element => {
+                globalObserver.observe(element);
+            });
+        });
+    </script>
+</body>
+</html>
